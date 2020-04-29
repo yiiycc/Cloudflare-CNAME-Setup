@@ -26,6 +26,7 @@ class ComposerStaticInit5e508418dd893d6a30cfa10d9ceecad0
         'P' => 
         array (
             'Psr\\Http\\Message\\' => 17,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'G' => 
         array (
@@ -56,6 +57,10 @@ class ComposerStaticInit5e508418dd893d6a30cfa10d9ceecad0
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
         'GuzzleHttp\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
@@ -74,11 +79,22 @@ class ComposerStaticInit5e508418dd893d6a30cfa10d9ceecad0
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'N' => 
+        array (
+            'Net_DNS2' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/net_dns2',
+            ),
+        ),
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit5e508418dd893d6a30cfa10d9ceecad0::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit5e508418dd893d6a30cfa10d9ceecad0::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit5e508418dd893d6a30cfa10d9ceecad0::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }
