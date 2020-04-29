@@ -33,6 +33,13 @@ class PageRulesActions implements Configurations
         ]);
     }
 
+    public function setOriginCacheControl(bool $active)
+    {
+        $this->addConfigurationOption('explicit_cache_control', [
+            'value' => $this->getBoolAsOnOrOff($active)
+        ]);
+    }
+
     public function setBrowserIntegrityCheck(bool $active)
     {
         $this->addConfigurationOption('browser_check', [
@@ -140,10 +147,10 @@ class PageRulesActions implements Configurations
         ]);
     }
 
-    public function setHostHeaderOverride(bool $active)
+    public function setHostHeaderOverride(string $value)
     {
         $this->addConfigurationOption('host_header_override', [
-            'value' => $this->getBoolAsOnOrOff($active)
+            'value' => $value
         ]);
     }
 
@@ -198,7 +205,7 @@ class PageRulesActions implements Configurations
         ]);
     }
 
-    public function setResolveOverride(bool $value)
+    public function setResolveOverride(string $value)
     {
         $this->addConfigurationOption('resolve_override', [
             'value' => $value
@@ -261,7 +268,7 @@ class PageRulesActions implements Configurations
             throw new ConfigurationsException('Can only be set to off, flexible, full, strict, origin_pull.');
         }
 
-        $this->addConfigurationOption('smart_errors', [
+        $this->addConfigurationOption('ssl', [
             'value' => $value
         ]);
     }

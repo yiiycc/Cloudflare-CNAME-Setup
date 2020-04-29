@@ -11,9 +11,12 @@ namespace Cloudflare\API\Endpoints;
 use Cloudflare\API\Adapter\Adapter;
 use Cloudflare\API\Configurations\PageRulesActions;
 use Cloudflare\API\Configurations\PageRulesTargets;
+use Cloudflare\API\Traits\BodyAccessorTrait;
 
 class PageRules implements API
 {
+    use BodyAccessorTrait;
+
     private $adapter;
 
     public function __construct(Adapter $adapter)
@@ -54,9 +57,9 @@ class PageRules implements API
 
         $query = $this->adapter->post('zones/' . $zoneID . '/pagerules', $options);
 
-        $body = json_decode($query->getBody());
+        $this->body = json_decode($query->getBody());
 
-        if (isset($body->result->id)) {
+        if (isset($this->body->result->id)) {
             return true;
         }
 
@@ -70,19 +73,19 @@ class PageRules implements API
         string $direction = null,
         string $match = null
     ): array {
-        if ($status === null && !in_array($status, ['active', 'disabled'])) {
+        if ($status != null && !in_array($status, ['active', 'disabled'])) {
             throw new EndpointException('Page Rules can only be listed by status of active or disabled.');
         }
 
-        if ($order === null && !in_array($order, ['status', 'priority'])) {
+        if ($order != null && !in_array($order, ['status', 'priority'])) {
             throw new EndpointException('Page Rules can only be ordered by status or priority.');
         }
 
-        if ($direction === null && !in_array($direction, ['asc', 'desc'])) {
+        if ($direction != null && !in_array($direction, ['asc', 'desc'])) {
             throw new EndpointException('Direction of Page Rule ordering can only be asc or desc.');
         }
 
-        if ($match === null && !in_array($match, ['all', 'any'])) {
+        if ($match != null && !in_array($match, ['all', 'any'])) {
             throw new EndpointException('Match can only be any or all.');
         }
 
@@ -94,20 +97,52 @@ class PageRules implements API
         ];
 
         $user = $this->adapter->get('zones/' . $zoneID . '/pagerules', $query);
-        $body = json_decode($user->getBody());
+        $this->body = json_decode($user->getBody());
 
-        return $body->result;
+        return $this->body->result;
     }
 
     public function getPageRuleDetails(string $zoneID, string $ruleID): \stdClass
     {
         $user = $this->adapter->get('zones/' . $zoneID . '/pagerules/' . $ruleID);
-        $body = json_decode($user->getBody());
-        return $body->result;
+        $this->body = json_decode($user->getBody());
+        return $this->body->result;
+    }
+
+    public function editPageRule(
+        string $zoneID,
+        string $ruleID,
+        PageRulesTargets $target,
+        PageRulesActions $actions,
+        bool $active = null,
+        int $priority = null
+    ): bool {
+        $options = [];
+        $options['targets'] = $target->getArray();
+        $options['actions'] = $actions->getArray();
+
+        if ($active !== null) {
+            $options['status'] = $active == true ? 'active' : 'disabled';
+        }
+
+        if ($priority !== null) {
+            $options['priority'] = $priority;
+        }
+
+        $query = $this->adapter->put('zones/' . $zoneID . '/pagerules/' . $ruleID, $options);
+
+        $this->body = json_decode($query->getBody());
+
+        if (isset($this->body->result->id)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function updatePageRule(
         string $zoneID,
+        string $ruleID,
         PageRulesTargets $target = null,
         PageRulesActions $actions = null,
         bool $active = null,
@@ -131,12 +166,11 @@ class PageRules implements API
             $options['priority'] = $priority;
         }
 
+        $query = $this->adapter->patch('zones/' . $zoneID . '/pagerules/' . $ruleID, $options);
 
-        $query = $this->adapter->patch('zones/' . $zoneID . '/pagerules', $options);
+        $this->body = json_decode($query->getBody());
 
-        $body = json_decode($query->getBody());
-
-        if (isset($body->result->id)) {
+        if (isset($this->body->result->id)) {
             return true;
         }
 
@@ -147,9 +181,9 @@ class PageRules implements API
     {
         $user = $this->adapter->delete('zones/' . $zoneID . '/pagerules/' . $ruleID);
 
-        $body = json_decode($user->getBody());
+        $this->body = json_decode($user->getBody());
 
-        if (isset($body->result->id)) {
+        if (isset($this->body->result->id)) {
             return true;
         }
 

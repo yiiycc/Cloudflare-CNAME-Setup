@@ -4,7 +4,7 @@
 
 ## Installation
 
-The recommended way to install this package is via the Packagist Dependency Manager ([cloudflare/sdk](https://packagist.org/packages/cloudflare/sdk)). You can specific usage examples on the Cloudflare Knowledge Base under: [Cloudflare PHP API Binding](https://support.cloudflare.com/hc/en-us/articles/115001661191)
+The recommended way to install this package is via the Packagist Dependency Manager ([cloudflare/sdk](https://packagist.org/packages/cloudflare/sdk)). You can get specific usage examples on the Cloudflare Knowledge Base under: [Cloudflare PHP API Binding](https://support.cloudflare.com/hc/en-us/articles/115001661191)
 
 ## Cloudflare API version 4
 
@@ -19,11 +19,15 @@ Each API call is provided via a similarly named function within various classes 
 - [x] [Web Application Firewall (WAF)](https://www.cloudflare.com/waf/)
 - [ ] Virtual DNS Management
 - [x] Custom hostnames
+- [x] Manage TLS settings
 - [x] Zone Lockdown and User-Agent Block rules
 - [ ] Organization Administration
 - [x] [Railgun](https://www.cloudflare.com/railgun/) administration
 - [ ] [Keyless SSL](https://blog.cloudflare.com/keyless-ssl-the-nitty-gritty-technical-details/)
 - [ ] [Origin CA](https://blog.cloudflare.com/universal-ssl-encryption-all-the-way-to-the-origin-for-free/)
+- [x] Crypto
+- [x] Load Balancers
+- [x] Firewall Settings
 
 Note that this repository is currently under development, additional classes and endpoints being actively added.
 

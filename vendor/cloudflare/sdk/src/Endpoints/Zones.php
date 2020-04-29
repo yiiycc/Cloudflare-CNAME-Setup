@@ -9,9 +9,12 @@
 namespace Cloudflare\API\Endpoints;
 
 use Cloudflare\API\Adapter\Adapter;
+use Cloudflare\API\Traits\BodyAccessorTrait;
 
 class Zones implements API
 {
+    use BodyAccessorTrait;
+
     private $adapter;
 
     public function __construct(Adapter $adapter)
@@ -39,20 +42,53 @@ class Zones implements API
         }
 
         $user = $this->adapter->post('zones', $options);
-        $body = json_decode($user->getBody());
-        return $body->result;
+        $this->body = json_decode($user->getBody());
+        return $this->body->result;
     }
 
     public function activationCheck(string $zoneID): bool
     {
         $user = $this->adapter->put('zones/' . $zoneID . '/activation_check');
-        $body = json_decode($user->getBody());
+        $this->body = json_decode($user->getBody());
 
-        if (isset($body->result->id)) {
+        if (isset($this->body->result->id)) {
             return true;
         }
 
         return false;
+    }
+
+    public function pause(string $zoneID): bool
+    {
+        $user = $this->adapter->patch('zones/' . $zoneID, ['paused' => true]);
+        $this->body = json_decode($user->getBody());
+
+        if (isset($this->body->result->id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function unpause(string $zoneID): bool
+    {
+        $user = $this->adapter->patch('zones/' . $zoneID, ['paused' => false]);
+        $this->body = json_decode($user->getBody());
+
+        if (isset($this->body->result->id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getZoneById(
+        string $zoneId
+    ): \stdClass {
+        $user = $this->adapter->get('zones/' . $zoneId);
+        $this->body = json_decode($user->getBody());
+
+        return (object)['result' => $this->body->result];
     }
 
     public function listZones(
@@ -87,9 +123,9 @@ class Zones implements API
         }
 
         $user = $this->adapter->get('zones', $query);
-        $body = json_decode($user->getBody());
+        $this->body = json_decode($user->getBody());
 
-        return (object)['result' => $body->result, 'result_info' => $body->result_info];
+        return (object)['result' => $this->body->result, 'result_info' => $this->body->result_info];
     }
 
     public function getZoneID(string $name = ''): string
@@ -116,7 +152,9 @@ class Zones implements API
     {
         $response = $this->adapter->get('zones/' . $zoneID . '/analytics/dashboard', ['since' => $since, 'until' => $until, 'continuous' => var_export($continuous, true)]);
 
-        return json_decode($response->getBody())->result;
+        $this->body = $response->getBody();
+
+        return json_decode($this->body)->result;
     }
 
     /**
@@ -130,15 +168,47 @@ class Zones implements API
     {
         $response = $this->adapter->patch('zones/' . $zoneID . '/settings/development_mode', ['value' => $enable ? 'on' : 'off']);
 
-        $body = json_decode($response->getBody());
+        $this->body = json_decode($response->getBody());
 
-        if ($body->success) {
+        if ($this->body->success) {
             return true;
         }
 
         return false;
     }
 
+    /**
+     * Return caching level settings
+     * @param string $zoneID
+     * @return string
+     */
+    public function getCachingLevel(string $zoneID): string
+    {
+        $response = $this->adapter->get('zones/' . $zoneID . '/settings/cache_level');
+
+        $this->body = json_decode($response->getBody());
+
+        return $this->body->result->value;
+    }
+
+    /**
+     * Change caching level settings
+     * @param string $zoneID
+     * @param string $level (aggressive | basic | simplified)
+     * @return bool
+     */
+    public function setCachingLevel(string $zoneID, string $level = 'aggressive'): bool
+    {
+        $response = $this->adapter->patch('zones/' . $zoneID . '/settings/cache_level', ['value' => $level]);
+
+        $this->body = json_decode($response->getBody());
+
+        if ($this->body->success) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Purge Everything
@@ -149,9 +219,9 @@ class Zones implements API
     {
         $user = $this->adapter->delete('zones/' . $zoneID . '/purge_cache', ['purge_everything' => true]);
 
-        $body = json_decode($user->getBody());
+        $this->body = json_decode($user->getBody());
 
-        if (isset($body->result->id)) {
+        if (isset($this->body->result->id)) {
             return true;
         }
 
@@ -172,16 +242,30 @@ class Zones implements API
         if (!is_null($tags)) {
             $options['tags'] = $tags;
         }
-      
+
         if (!is_null($hosts)) {
             $options['hosts'] = $hosts;
         }
 
         $user = $this->adapter->delete('zones/' . $zoneID . '/purge_cache', $options);
 
-        $body = json_decode($user->getBody());
+        $this->body = json_decode($user->getBody());
 
-        if (isset($body->result->id)) {
+        if (isset($this->body->result->id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Delete Zone
+     */
+    public function deleteZone(string $identifier): bool
+    {
+        $user = $this->adapter->delete('zones/' . $identifier);
+        $this->body = json_decode($user->getBody());
+        if (isset($this->body->result->id)) {
             return true;
         }
 
